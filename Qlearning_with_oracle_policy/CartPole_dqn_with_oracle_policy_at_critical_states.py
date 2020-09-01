@@ -14,6 +14,10 @@ Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if 
 
 from collections import deque
 
+'''
+Double DQN code adapted and modified from https://github.com/higgsfield/RL-Adventure/blob/master/2.double%20dqn.ipynb
+'''
+
 env_id = "CartPole-v0"
 env = gym.make(env_id)
 
@@ -25,14 +29,14 @@ class ReplayBuffer(object):
         self.buffer = deque(maxlen=capacity)
         self.critical_buffer = []
 
-    def push(self, state, action, reward, next_state, done, state_critical_check):
+    def push(self, state, action, reward, next_state, done, is_critical):
         state = np.expand_dims(state, 0)
         next_state = np.expand_dims(next_state, 0)
-        self.buffer.append((state, action, reward, next_state, done, state_critical_check))
+        self.buffer.append((state, action, reward, next_state, done, is_critical))
 
     def sample(self, batch_size):
-        state, action, reward, next_state, done, state_critical_check = zip(*random.sample(self.buffer, batch_size))
-        return np.concatenate(state), action, reward, np.concatenate(next_state), done, state_critical_check
+        state, action, reward, next_state, done, is_critical = zip(*random.sample(self.buffer, batch_size))
+        return np.concatenate(state), action, reward, np.concatenate(next_state), done, is_critical
 
     def __len__(self):
         return len(self.buffer)+len(self.critical_buffer)
@@ -95,7 +99,7 @@ def update_target(current_model, target_model):
     target_model.load_state_dict(current_model.state_dict())
 
 
-def compute_td_loss(batch_size, critical_loss_weight=0.1):
+def compute_loss(batch_size, critical_loss_weight=0.1):
     """
     :param batch_size: number of transitons(s,a,s',r) to be sampled from the replay buffer for loss calculation
     :param critical_loss_weight: a number < 1, to lower the weight of loss calculated for critical states
@@ -140,7 +144,7 @@ def compute_td_loss(batch_size, critical_loss_weight=0.1):
     return TD_loss, critical_loss
 
 
-def plot(frame_idx, rewards, usual_losses, critical_losses, iter):
+def plot(frame_idx, rewards, TD_losses, critical_losses, iter):
     # clear_output(True)
     plt.figure(figsize=(30,5))
     plt.subplot(131)
@@ -151,7 +155,7 @@ def plot(frame_idx, rewards, usual_losses, critical_losses, iter):
     plt.plot(critical_losses)
     plt.subplot(133)
     plt.title('TD loss')
-    plt.plot(usual_losses)
+    plt.plot(TD_losses)
     plt.savefig(path+results_dir+"/CartPole_dqn_plots_using_weighted_loss_"+str(iter))
 
 
@@ -239,7 +243,7 @@ if __name__ == "__main__":
         episode_reward = 0
         ep_num = 0
 
-        ## If the environment is solved is_win is set true
+        ## If the environment is solved is_win is set to true
         is_win = False
 
         state = env.reset()
@@ -272,7 +276,7 @@ if __name__ == "__main__":
 
             ## Update the loss
             if len(replay_buffer) > batch_size:
-                TD_loss, critical_loss = compute_td_loss(batch_size)
+                TD_loss, critical_loss = compute_loss(batch_size)
                 TD_losses.append(TD_loss.item())
                 critical_losses.append(critical_loss.item())
 

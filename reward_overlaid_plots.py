@@ -3,10 +3,10 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 
-with open('Qlearning_with_oracle_policy/stats_upper_bound.pickle', 'rb') as f:
+with open('Stats/stats_qlearning_with_oracle_policy_for_cliffenv.pickle', 'rb') as f:
     stats_upper_bound = pkl.load(f)
 
-with open('Qlearning/stats_vanilla.pickle', 'rb') as f:
+with open('Stats/stats_vanillaq_for_cliffenv.pickle', 'rb') as f:
     stats_vanilla = pkl.load(f)
 
 

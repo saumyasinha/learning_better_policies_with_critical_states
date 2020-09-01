@@ -154,10 +154,10 @@ if __name__ == "__main__":
     Q, stats = q_learning(env, num_episodes, final_q_at_critical_states)
     pprint(Q)
 
-    f = open('stats_upper_bound.pickle', 'wb')
+    f = open('Stats/stats_qlearning_with_oracle_policy_for_cliffenv.pickle', 'wb')
     pickle.dump(stats.episode_rewards, f)
 
-    plotting.plot_episode_stats(stats, "./plots/q_learning_with_oracle_policy_at_critical_states.png", noshow = True)
+    plotting.plot_episode_stats(stats, "./plots/CliffWalking/q_learning_with_oracle_policy_at_critical_states.png", noshow = True)
 
 
 

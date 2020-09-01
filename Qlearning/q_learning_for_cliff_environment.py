@@ -166,10 +166,10 @@ if __name__ == "__main__":
 
     pprint(Q)
 
-    f = open('stats_vanilla.pickle', 'wb')
+    f = open('Stats/stats_vanillaq_for_cliffenv.pickle', 'wb')
     pickle.dump(stats.episode_rewards, f)
 
-    plotting.plot_episode_stats(stats, "./plots/vanilla_q_learning.png", noshow = True)
+    plotting.plot_episode_stats(stats, "./plots/CliffWalking/vanilla_q_learning.png", noshow = True)
 
 
 
